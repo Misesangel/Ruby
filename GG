@@ -1,0 +1,102 @@
+# Define a Book class to hold information about individual books
+class Book
+  attr_accessor :title, :author, :isbn, :available
+
+  def initialize(title, author, isbn)
+    @title = title
+    @author = author
+    @isbn = isbn
+    @available = true
+  end
+
+  def to_s
+    status = @available ? "[Available]" : "[Checked Out]"
+    "'#{@title}' by #{@author} (ISBN: #{@isbn}) #{status}"
+  end
+end
+
+# Define a Member class to represent library users
+class Member
+  attr_reader :name, :member_id, :borrowed_books
+
+  def initialize(name, member_id)
+    @name = name
+    @member_id = member_id
+    @borrowed_books = []
+  end
+
+  def borrow_book(book)
+    if book.available
+      book.available = false
+      @borrowed_books << book
+      puts "#{@name} successfully borrowed '#{book.title}'."
+    else
+      puts "Sorry, '#{book.title}' is currently checked out."
+    end
+  end
+
+  def return_book(book)
+    if @borrowed_books.include?(book)
+      book.available = true
+      @borrowed_books.delete(book)
+      puts "#{@name} returned '#{book.title}'."
+    else
+      puts "#{@name} does not have '#{book.title}' checked out."
+    end
+  end
+end
+
+# The Library class manages the collections and operations
+class Library
+  def initialize(name)
+    @name = name
+    @books = []
+    @members = []
+  end
+
+  def add_book(book)
+    @books << book
+  end
+
+  def register_member(member)
+    @members << member
+  end
+
+  def list_inventory
+    puts "\n--- #{@name} Inventory ---"
+    @books.each { |book| puts book }
+  end
+
+  def find_by_isbn(isbn)
+    @books.find { |book| book.isbn == isbn }
+  end
+end
+
+# --- Execution Logic ---
+
+# 1. Create a Library
+my_library = Library.new("Central Ruby Library")
+
+# 2. Add Books to the Library
+book1 = Book.new("The Great Gatsby", "F. Scott Fitzgerald", "12345")
+book2 = Book.new("Ruby Metaprogramming", "Paolo Perrotta", "67890")
+my_library.add_book(book1)
+my_library.add_book(book2)
+
+# 3. Register a Member
+rudy = Member.new("Rudy", "M001")
+my_library.register_member(rudy)
+
+# 4. Perform Library Actions
+my_library.list_inventory
+
+puts "\nAttempting to borrow books..."
+rudy.borrow_book(book1)
+rudy.borrow_book(book1) # Try to borrow the same book again
+
+my_library.list_inventory
+
+puts "\nReturning books..."
+rudy.return_book(book1)
+
+my_library.list_inventory
