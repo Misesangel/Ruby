@@ -1,0 +1,94 @@
+# A module to provide search functionality across different classes
+module Searchable
+  def find_by_title(collection, title)
+    collection.select { |item| item.title.downcase.include?(title.downcase) }
+  end
+end
+
+# Base class for all library items
+class LibraryItem
+  attr_accessor :title, :author, :id
+  
+  def initialize(title, author, id)
+    @title = title
+    @author = author
+    @id = id
+    @available = true
+  end
+
+  def available?
+    @available
+  end
+
+  def checkout
+    raise "Item already checked out!" unless @available
+    @available = false
+  end
+
+  def return_item
+    @available = true
+  end
+end
+
+# Specific class for Books, inheriting from LibraryItem
+class Book < LibraryItem
+  attr_reader :pages
+  
+  def initialize(title, author, id, pages)
+    super(title, author, id)
+    @pages = pages
+  end
+
+  def to_s
+    "[Book] '#{@title}' by #{@author} (#{@pages} pages) - Status: #{@available ? 'Available' : 'On Loan'}"
+  end
+end
+
+# Class to manage the Library collection
+class Library
+  include Searchable
+  
+  def initialize(name)
+    @name = name
+    @books = []
+  end
+
+  def add_book(book)
+    @books << book
+    puts "Added: #{book.title}"
+  end
+
+  def list_books
+    puts "\n--- #{@name} Collection ---"
+    @books.each { |book| puts book }
+  end
+
+  def find_books(title)
+    results = find_by_title(@books, title)
+    puts "\nSearch Results for '#{title}':"
+    results.any? ? results.each { |b| puts b } : puts("No books found.")
+  end
+end
+
+# --- Execution ---
+my_library = Library.new("City Central Library")
+
+# Adding books
+my_library.add_book(Book.new("The Great Gatsby", "F. Scott Fitzgerald", "B001", 180))
+my_library.add_book(Book.new("1984", "George Orwell", "B002", 328))
+my_library.add_book(Book.new("Ruby Programming", "Jane Doe", "B003", 500))
+
+# Displaying library
+my_library.list_books
+
+# Searching for a book
+my_library.find_books("ruby")
+
+# Simulating a checkout
+begin
+  target_book = my_library.find_by_title([], "1984") # Finding would normally happen in library logic
+  puts "\nChecking out 1984..."
+  # (Simulated logic for brevity)
+rescue => e
+  puts "Error: #{e.message}"
+end
