@@ -1,0 +1,81 @@
+module LibraryActions
+  def checkout_item(item)
+    raise "Item already checked out" if item.checked_out?
+    item.status = :out
+  end
+
+  def return_item(item)
+    item.status = :available
+  end
+end
+
+class LibraryItem
+  attr_accessor :title, :author, :status
+
+  def initialize(title, author)
+    @title = title
+    @author = author
+    @status = :available
+  end
+
+  def checked_out?
+    @status == :out
+  end
+end
+
+class Book < LibraryItem
+  attr_reader :pages
+
+  def initialize(title, author, pages)
+    super(title, author)
+    @pages = pages
+  end
+end
+
+class Library
+  include LibraryActions
+
+  def initialize(name)
+    @name = name
+    @inventory = []
+  end
+
+  def add_item(item)
+    @inventory << item
+  end
+
+  def find_by_title(title)
+    @inventory.find { |item| item.title.downcase == title.downcase }
+  end
+
+  def list_inventory
+    @inventory.each do |item|
+      puts "#{item.title} by #{item.author} - [#{item.status}]"
+    end
+  end
+end
+
+begin
+  my_library = Library.new("City Central Library")
+  
+  book1 = Book.new("The Great Gatsby", "F. Scott Fitzgerald", 180)
+  book2 = Book.new("1984", "George Orwell", 328)
+  
+  my_library.add_item(book1)
+  my_library.add_item(book2)
+  
+  puts "Initial Inventory:"
+  my_library.list_inventory
+  
+  target = my_library.find_by_title("1984")
+  my_library.checkout_item(target)
+  
+  puts "\nAfter Checkout:"
+  my_library.list_inventory
+  
+  my_library.checkout_item(target)
+rescue => e
+  puts "\nError: #{e.message}"
+ensure
+  puts "\nProcess complete."
+end
