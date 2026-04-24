@@ -1,7 +1,7 @@
 module LibraryActions
   def checkout_item(item)
     raise "Item already checked out" if item.checked_out?
-    item.status = :out
+    item.status = :outs
   end
 
   def return_item(item)
