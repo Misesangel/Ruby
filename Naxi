@@ -67,7 +67,7 @@ begin
   puts "Initial Inventory:"
   my_library.list_inventory
   
-  target = my_library.find_by_title("1984")
+  target = my_library.find_by_title("1974")
   my_library.checkout_item(target)
   
   puts "\nAfter Checkout:"
